@@ -43,6 +43,7 @@ Esta libreria esta compuesta por una unica clase, la cual contiene un metodo *pu
   * type: *integer* **(opcional,default 3)** Nivel del error con el que queremos etiquetar el log, acepta valores del 0 - 7.
   * destination: *string* **(opcional)** puede ser una lista de correos electronicos o un path absoluto del archivo donde queremos que se escriban los logs.
   * headers: *array* **(opcional)** Arreglo asociativo con las cabeceras adicionales que deseamos agregar al correo electronico, este parametro solo tendra valides si vamos a enviar el log por email.
+* Return : **TRUE** si se realizo la operación o **FALSE** en caso contrario.
 
 ### Nivel del error 
 
@@ -60,17 +61,19 @@ La clase provee al desarrollador de 8 constantes para facilitar el uso de este p
 | PEL_DEBUG     | 7     | debug     |
 
 
-### Cabeceras Adicionales
+### Cabeceras Adicionales(SMTP)
 
 **error_log()** utiliza la funcion **mail()** cuando se pasa un email como destinatario del log, eso quiere decir que las mismas cabeceras que podemos definir en **mail()** al momento de enviar un correo las vamos a poder definir el la función **error_log()**. Sin embargo, **PHPLorError** solo soportara una pequeña lista de cabeceras y aqui se la presentamos:
 
-* From
-* Reply-To
-* Content-type
-* Cc
-* Bcc
-* Subject
-* Return-Path
+* **From**: Es el mas **IMPORTANTE** de todos!!, ya que sin el **NO SE ENVIARA EL CORREO**.
+* **Subject**: Asunto del correo.
+* **Reply-To**: Correo al cual ira la respuesta del usuario.
+* **Content-type**: el tipo de contenido por defecto es *text/plain charset=iso-8859-1*.
+* **Cc**: Enviar una copia a otro correo.
+* **Bcc**: Enviar una copia oculta a otro correo.
+* **Return-Path**: correo al cual van a llegar los errores de envio.
+ 
+**NOTA**: La cabecera **To** es agregada automaticamente por **PHPErrorLog** y cualquier otra cabecera que se pase sera eliminada.
 
 ### Enviando Logs al archivo por defecto
 ```php
@@ -80,11 +83,48 @@ PHPErrorLog::write('MiSistema: probando... logs\n\t\notra forma de hacer logs');
 ```
 
 ### Enviando Logs por Email
-Para poder enviar 
+
+Para poder enviar email es necesario que tengamos instalado y configurado un servidor de correo en nuestra maquina o en la maquina donde se ejecutara nuestra aplicación, si utilizan LINUX :+1: les recomiendo este [link](https://github.com/ElMijo/php-error-log/edit/master/README.md)
+
 ```php
+$headers = array(
+  'From'    => 'usuario@dominio.com',
+  'Subject' => 'Probando PHPErrorLog',
+  'Cc'      => 'otrocorreo@dominio.com'
+);
+
+PHPErrorLog::write('probando...',PEL_CRITICAL,"Jerry Anselmi <jerry.anselmi@gmail.com>,Pedro Perez <pperez@dominio.com>,fulano@dominio.com",$headers);
+```
+#### Email con contenido HTML
+```php
+$headers = array(
+  'Content-type' => 'text/html; charset=iso-8859-1',
+  'From'         => 'usuario@dominio.com',
+  'Subject'      => 'Probando PHPErrorLog',
+  'Cc'           => 'otrocorreo@dominio.com'
+);
+
+PHPErrorLog::write('<h1>PHPErrorLog</h1><br><p>probando...</p>',PEL_WARNING,"Jerry Anselmi <jerry.anselmi@gmail.com>,Pedro Perez <pperez@dominio.com>,fulano@dominio.com",$headers);
 ```
 
 ### Enviando Logs a un Archivo Definifo por el Usuario
 ```php
-PHPErrorLog::write('probando...',1,realpath('dev.log'));
+PHPErrorLog::write('probando...',PEL_ERROR,realpath('dev.log'));
 ```
+```php
+PHPErrorLog::write('probando...',PEL_DEBUG,'/ruta/absoluta/del/dev.log');
+```
+
+## Posibles impedimentos paraescribir el log
+
+* El mensaje es *empty*
+* No se agrego la cabecera **From** en caso de que se desee enviar por correo
+* Que no se tengan permisos de escritura en caso d eque el usuario defina el log, sin embargo el log se va a escribir en el archvio default
+ 
+### El tema de los permisos
+
+En caso de que definamos el archivo log, tenemos que asignarle a apache como dueño del mismo o darle permisos de escritura
+
+* opción 1: sudo chown www-data:www-data /ruta/absoluta/del/dev.log
+* opción 2: sudo chmod 0766 /ruta/absoluta/del/dev.log
+
