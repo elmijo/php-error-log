@@ -36,7 +36,7 @@ class PHPErrorLog
 	/**
 	 * Funcion para escribir los logs
 	 * @param  string  $message     Cadena de texto con el mensaje se desea mandar al log
-	 * @param  integer $type        Nivel del error
+	 * @param  integer $type        Nivel del error con el que queremos etiquetar el log
 	 * @param  string  $destination Cadena de texto con el email destinatario del log o la ruta absoluta del archivo donde se desea almacenar el log
 	 * @param  array   $headers     Arreglo asociativo con las cabeceras adicionales correspondientes a un email
 	 * @return void
@@ -209,6 +209,12 @@ class PHPErrorLog
 		return FALSE;
 	}
 
+	/**
+	 * Permite validar los headers que el usuario desea incorporar al correo electronico que se enviara
+	 * @param  array  $headers     Arreglo asociativo con los headers
+	 * @param  string $destination Caena de texto separada por comas de los destinatarios
+	 * @return string              Cadena de texto de headersGuia
+	 */
 	private static function validarHeaders($headers,$destination)
 	{
 		
