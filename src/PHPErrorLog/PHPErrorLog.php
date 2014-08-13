@@ -19,7 +19,13 @@ class PHPErrorLog
 	 * Texto para los niveles del log
 	 * @var array
 	 */
-	private static $types = array('emergency','alert','critical','error','warning','notice','info','debug');
+	private static $types   = array('emergency','alert','critical','error','warning','notice','info','debug');
+
+	/**
+	 * Arreglo con los headers permitidos
+	 * @var array
+	 */
+	private static $headers = array('Content-type','From','Cc','Bcc','Reply-To','Subject','Return-Path');
 
 	/**
 	 * Formato de la fecha del log
@@ -32,20 +38,26 @@ class PHPErrorLog
 	 * @param  string  $message     Cadena de texto con el mensaje se desea mandar al log
 	 * @param  integer $type        Nivel del error
 	 * @param  string  $destination Cadena de texto con el email destinatario del log o la ruta absoluta del archivo donde se desea almacenar el log
-	 * @param  string  $headers     Cadena de texto conla scabeceras adicionales separadas por ';'. Esopcion es valida solo cuando do el log va a un correo electronico
+	 * @param  array   $headers     Arreglo asociativo con las cabeceras adicionales correspondientes a un email
 	 * @return void
 	 */
-	public static function write($message='',$type = 3,$destination='',$headers='')
+	public static function write($message='',$type = 3,$destination='',$headers=array())
 	{
-		$arguments = array();
+		$arguments   = array();
 
-		$message   = self::validateMessage($message,$type);
+		$message     = self::validateMessage($message,$type);
+
+		$destination = self::validaDestination($destination);
+
+		$headers     = self::validarHeaders($headers,$destination);
+
+		//var_dump("$destination");exit;
 
 		if(!!$message)
 		{
 			array_push($arguments, $message);
 
-			if(self::isEmail($destination))
+			if(!!$destination)
 			{
 				array_push($arguments,1,$destination,$headers);
 			}
@@ -88,12 +100,26 @@ class PHPErrorLog
 
 	/**
 	 * Valida si una cadena de texto es un email
-	 * @param  styring  $email Cadena de texto a evaluar
-	 * @return boolean         Devuelve TRUE si es email o FALSE en caso contrario
+	 * @param  styring  $destination Cadena de texto a evaluar
+	 * @return boolean               Devuelve TRUE si es email o FALSE en caso contrario
 	 */
-	private static function isEmail($email)
+	private static function validaDestination($destination)
 	{
-		return filter_var($email, FILTER_VALIDATE_EMAIL);
+		return implode(
+			',', 
+			array_filter(
+				array_map(
+					function($val){
+						return !!filter_var(
+								str_replace('>', '', array_pop(explode('<',$val)))
+								,FILTER_VALIDATE_EMAIL
+							)?$val:FALSE
+						;
+					},
+					array_map('trim',explode(',',$destination))
+				)
+			)
+		);
 	}
 
 	/**
@@ -181,6 +207,29 @@ class PHPErrorLog
 		}
 		
 		return FALSE;
+	}
+
+	private static function validarHeaders($headers,$destination)
+	{
+		
+		foreach ($headers as $key => $header)
+		{
+			if(!in_array($key, self::$headers))
+			{
+				unset($headers[$key]);
+			}
+			else
+			{
+				$headers[$key] = "$key:$header";
+			}
+		}
+		if(count($headers)>0)
+		{
+			$headers['To'] = $destination;
+			array_unshift($headers, "MIME-Version: 1.0","X-Priority: 1");
+			array_push($headers, "X-Mailer: PHP/".phpversion());	
+		}
+		return implode("\r\n", $headers);
 	}
 }
 ?>
