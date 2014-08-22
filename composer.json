@@ -4,7 +4,7 @@
     "description": "Una pequeña libreria para manejar los logs de tu aplicación de forma simple.. rapida.. y directa!!",
     "keywords": ["log", "logging","php","error","error_log"],
     "homepage": "https://github.com/ElMijo/php-error-log",
-    "version": "1.0",
+    "version": "1.1",
     "license": "MIT",
     "authors": [
         {
@@ -16,7 +16,8 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "elmijo/php-cliente-addr": "dev-master"
     },
     "autoload": {
         "psr-0": {

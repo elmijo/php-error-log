@@ -12,10 +12,10 @@ Una pequeña libreria para manejar los logs de tu aplicación de forma simple.. 
 
 ### Instalación
 Lo podemos hacer a travéz de [composer](https://getcomposer.org/doc/00-intro.md):
-```php
+```json
 "require":{
   ...
-  "elmijo/php-error-log": "dev-master"
+  "elmijo/php-error-log": "1.1"
   ...
 }
 ```

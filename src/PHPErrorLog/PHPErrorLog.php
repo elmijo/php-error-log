@@ -1,6 +1,8 @@
 <?php
 namespace PHPErrorLog;
 
+use PHPClienteAddr\PHPClienteAddr;
+
 define("PEL_EMERGENCY",0);
 define("PEL_ALERT",1);
 define("PEL_CRITICAL",2);
@@ -47,19 +49,17 @@ class PHPErrorLog
 
 		$message     = self::validateMessage($message,$type);
 
-		$destination = self::validaDestination($destination);
+		$emails      = self::validaEmails($destination);
 
 		$headers     = self::validarHeaders($headers,$destination);
-
-		//var_dump("$destination");exit;
 
 		if(!!$message)
 		{
 			array_push($arguments, $message);
 
-			if(!!$destination)
+			if(!!$emails)
 			{
-				array_push($arguments,1,$destination,$headers);
+				array_push($arguments,1,$emails,$headers);
 			}
 			else if(self::isFile($destination))
 			{
@@ -67,7 +67,7 @@ class PHPErrorLog
 			}
 			else
 			{
-				$arguments[0] = array_pop(explode("]",$arguments[0]));
+				$arguments[0] = trim(preg_replace('/\s\s+/', ' ', array_pop(explode("]",$arguments[0]))));
 			}
 
 			return call_user_func_array('error_log',$arguments);
@@ -79,31 +79,11 @@ class PHPErrorLog
 	}
 
 	/**
-	 * Permite obtener la dirección IP de la conexión
-	 * @return string
-	 */
-	private static function getIP()
-	{
-		if (!empty($_SERVER['HTTP_CLIENT_IP']))
-		{
-			return $_SERVER['HTTP_CLIENT_IP'];
-		}
-		elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-		{
-			return $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}
-		else
-		{
-			return $_SERVER['REMOTE_ADDR']=='::1'?'127.0.0.1':$_SERVER['REMOTE_ADDR'];
-		}
-	}
-
-	/**
 	 * Valida si una cadena de texto es un email
 	 * @param  styring  $destination Cadena de texto a evaluar
 	 * @return boolean               Devuelve TRUE si es email o FALSE en caso contrario
 	 */
-	private static function validaDestination($destination)
+	private static function validaEmails($destination)
 	{
 		return implode(
 			',', 
@@ -143,16 +123,6 @@ class PHPErrorLog
 		return FALSE;		
 	}
 
-	/**
-	 * Valida si una cadena de texto es una IP valida
-	 * @param  string  $ip Cadena de texto a evaluar
-	 * @return boolean     Devuelve TRUE si es una IP valido o FALSE en caso contrario
-	 */
-	private static function isIP($ip)
-	{
-		return filter_var($ip, FILTER_VALIDATE_IP);	
-	}
-	
 	/**
 	 * Devuelve la fecha para el log
 	 * @return string
@@ -203,7 +173,7 @@ class PHPErrorLog
 
 		if($msg!='')
 		{
-			return "[".self::getDate()."] [".self::getType($type)."] [client ".self::getIP()."] $msg\n";
+			return "[".self::getDate()."] [".self::getType($type)."] [client ".PHPClienteAddr::$IP."] $msg\n";
 		}
 		
 		return FALSE;
