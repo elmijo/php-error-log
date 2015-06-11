@@ -1,4 +1,2 @@
-/vendor/
-/test/
-/sample/
-composer.lock
+vendor/
+build/

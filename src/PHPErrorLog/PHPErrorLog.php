@@ -1,7 +1,5 @@
 <?php
-namespace PHPErrorLog;
-
-use PHPClienteAddr\PHPClienteAddr;
+namespace PHPTools\PHPErrorLog;
 
 define("PEL_EMERGENCY",0);
 define("PEL_ALERT",1);
@@ -171,9 +169,11 @@ class PHPErrorLog
 	{
 		$msg = trim($msg);
 
+		$address = new \PHPTools\PHPClientAddr\PHPClientAddr();
+
 		if($msg!='')
 		{
-			return "[".self::getDate()."] [".self::getType($type)."] [client ".PHPClienteAddr::$IP."] $msg\n";
+			return "[".self::getDate()."] [".self::getType($type)."] [client ".$address->ip."] $msg\n";
 		}
 		
 		return FALSE;
