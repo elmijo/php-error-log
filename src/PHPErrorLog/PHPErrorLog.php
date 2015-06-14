@@ -19,19 +19,19 @@ class PHPErrorLog
 	 * Texto para los niveles del log
 	 * @var array
 	 */
-	private static $types   = array('emergency','alert','critical','error','warning','notice','info','debug');
+	private $types   = array('emergency','alert','critical','error','warning','notice','info','debug');
 
 	/**
 	 * Arreglo con los headers permitidos
 	 * @var array
 	 */
-	private static $headers = array('Content-type','From','Cc','Bcc','Reply-To','Subject','Return-Path');
+	private $headers = array('Content-type','From','Cc','Bcc','Reply-To','Subject','Return-Path');
 
 	/**
 	 * Formato de la fecha del log
 	 * @var string
 	 */
-	private static $date_format = 'D d M H:m:s Y';
+	private $date_format = 'D d M H:m:s Y';
 
 	/**
 	 * Funcion para escribir los logs
@@ -41,15 +41,15 @@ class PHPErrorLog
 	 * @param  array   $headers     Arreglo asociativo con las cabeceras adicionales correspondientes a un email
 	 * @return void
 	 */
-	public static function write($message='',$type = 3,$destination='',$headers=array())
+	public function write($message='',$type = 3,$destination='',$headers=array())
 	{
 		$arguments   = array();
 
-		$message     = self::validateMessage($message,$type);
+		$message     = $this->validateMessage($message,$type);
 
-		$emails      = self::validaEmails($destination);
+		$emails      = $this->validaEmails($destination);
 
-		$headers     = self::validarHeaders($headers,$destination);
+		$headers     = $this->validarHeaders($headers,$destination);
 
 		if(!!$message)
 		{
@@ -59,7 +59,7 @@ class PHPErrorLog
 			{
 				array_push($arguments,1,$emails,$headers);
 			}
-			else if(self::isFile($destination))
+			else if($this->isFile($destination))
 			{
 				array_push($arguments,3,$destination);
 			}
@@ -71,7 +71,7 @@ class PHPErrorLog
 			return call_user_func_array('error_log',$arguments);
 		}
 
-		self::messageFalse();
+		$this->messageFalse();
 
 		return FALSE;
 	}
@@ -81,10 +81,10 @@ class PHPErrorLog
 	 * @param  styring  $destination Cadena de texto a evaluar
 	 * @return boolean               Devuelve TRUE si es email o FALSE en caso contrario
 	 */
-	private static function validaEmails($destination)
+	private function validaEmails($destination)
 	{
 		return implode(
-			',', 
+			',',
 			array_filter(
 				array_map(
 					function($val){
@@ -105,7 +105,7 @@ class PHPErrorLog
 	 * @param  string  $file Cadena de texto a evaluar
 	 * @return boolean       Devuelve TRUE si es un archivo valido o FALSE en caso contrario
 	 */
-	private static function isFile($file)
+	private function isFile($file)
 	{
 		if(!!file_exists($file))
 		{
@@ -115,19 +115,19 @@ class PHPErrorLog
 			}
 			else
 			{
-				self::fileNotWritable($file);
+				$this->fileNotWritable($file);
 			}
 		}
-		return FALSE;		
+		return FALSE;
 	}
 
 	/**
 	 * Devuelve la fecha para el log
 	 * @return string
 	 */
-	private static function getDate()
+	private function getDate()
 	{
-		return date(self::$date_format);
+		return date($this->date_format);
 	}
 
 	/**
@@ -135,16 +135,16 @@ class PHPErrorLog
 	 * @param  integer $type Numero de tipo de log que se desea
 	 * @return string
 	 */
-	private static function getType($type)
+	private function getType($type)
 	{
-		return self::$types[$type<0||$type>7?3:$type];
+		return $this->types[$type<0||$type>7?3:$type];
 	}
 
 	/**
 	 * Escribe un log para informarle al usuario que se invoco el metodo write sin mensaje
 	 * @return boolean     Devuelve TRUE si se ejecuta la funcion errorLog exitosamente o FALSE en caso contrario
 	 */
-	private static function messageFalse()
+	private function messageFalse()
 	{
 		return error_log("PHPErrorLog: Se necesita un mensaje valido");
 	}
@@ -154,7 +154,7 @@ class PHPErrorLog
 	 * @param  string $file Archivo suministrado
 	 * @return boolean      Devuelve TRUE si se ejecuta la funcion errorLog exitosamente o FALSE en caso contrario
 	 */
-	private static function fileNotWritable($file)
+	private function fileNotWritable($file)
 	{
 		return error_log("PHPErrorLog: No se tienen permisos de escritura sobre el archivo ".$file);
 	}
@@ -165,7 +165,7 @@ class PHPErrorLog
 	 * @param  string $type   Tipo de mensaje
 	 * @return string|boolean Devuelve un mensaje estructurado o FALSE en caso de que no sea un mensaje valido
 	 */
-	private static function validateMessage($msg,$type)
+	private function validateMessage($msg,$type)
 	{
 		$msg = trim($msg);
 
@@ -173,9 +173,8 @@ class PHPErrorLog
 
 		if($msg!='')
 		{
-			return "[".self::getDate()."] [".self::getType($type)."] [client ".$address->ip."] $msg\n";
+			return "[".$this->getDate()."] [".$this->getType($type)."] [client ".$address->ip."] $msg\n";
 		}
-		
 		return FALSE;
 	}
 
@@ -185,12 +184,11 @@ class PHPErrorLog
 	 * @param  string $destination Caena de texto separada por comas de los destinatarios
 	 * @return string              Cadena de texto de headersGuia
 	 */
-	private static function validarHeaders($headers,$destination)
+	private function validarHeaders($headers,$destination)
 	{
-		
 		foreach ($headers as $key => $header)
 		{
-			if(!in_array($key, self::$headers))
+			if(!in_array($key, $this->headers))
 			{
 				unset($headers[$key]);
 			}
@@ -203,7 +201,7 @@ class PHPErrorLog
 		{
 			$headers['To'] = $destination;
 			array_unshift($headers, "MIME-Version: 1.0","X-Priority: 1");
-			array_push($headers, "X-Mailer: PHP/".phpversion());	
+			array_push($headers, "X-Mailer: PHP/".phpversion());
 		}
 		return implode("\r\n", $headers);
 	}

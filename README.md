@@ -1,6 +1,8 @@
 PHP Error Log
 =============
 
+[![Build Status](https://travis-ci.org/ElMijo/php-error-log.svg)](https://travis-ci.org/ElMijo/php-error-log) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ElMijo/php-error-log/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ElMijo/php-error-log/?branch=master)
+
 Una pequeña libreria para manejar los logs de tu aplicación de forma simple.. rapida.. y directa!!. En lineas lo que se hizo fue crear una capa de abstracción entre el programador y la función **error_log()** de PHP.
 
 ## Entonces.. ¿Que tiene de especial?
@@ -15,7 +17,7 @@ Lo podemos hacer a travéz de [composer](https://getcomposer.org/doc/00-intro.md
 ```json
 "require":{
   ...
-  "elmijo/php-error-log": "1.1"
+  "elmijo/php-error-log": "2.0"
   ...
 }
 ```
@@ -23,9 +25,9 @@ Lo podemos hacer a travéz de [composer](https://getcomposer.org/doc/00-intro.md
 ```php
 require '../vendor/autoload.php';
 
-use PHPErrorLog\PHPErrorLog;
+$logger = new PHPTools\PHPErrorLog\PHPErrorLog();
 
-PHPErrorLog::write('probando...');
+$logger->write('probando...');
 
 ```
 
@@ -45,7 +47,7 @@ Esta libreria esta compuesta por una unica clase, la cual contiene un metodo *pu
   * headers: *array* **(opcional)** Arreglo asociativo con las cabeceras adicionales que deseamos agregar al correo electronico, este parametro solo tendra valides si vamos a enviar el log por email.
 * Return : **TRUE** si se realizo la operación o **FALSE** en caso contrario.
 
-### Nivel del error 
+### Nivel del error
 
 La clase provee al desarrollador de 8 constantes para facilitar el uso de este parametro
 
@@ -72,14 +74,14 @@ La clase provee al desarrollador de 8 constantes para facilitar el uso de este p
 * **Cc**: Enviar una copia a otro correo.
 * **Bcc**: Enviar una copia oculta a otro correo.
 * **Return-Path**: correo al cual van a llegar los errores de envio.
- 
+
 **NOTA**: La cabecera **To** es agregada automaticamente por **PHPErrorLog** y cualquier otra cabecera que se pase sera eliminada.
 
 ### Enviando Logs al archivo por defecto
 ```php
-PHPErrorLog::write('PHPErrorLog: probando... logs');
+$logger->write('PHPErrorLog: probando... logs');
 
-PHPErrorLog::write('MiSistema: probando... logs\n\t\notra forma de hacer logs');
+$logger->write('MiSistema: probando... logs\n\t\notra forma de hacer logs');
 ```
 
 ### Enviando Logs por Email
@@ -93,7 +95,7 @@ $headers = array(
   'Cc'      => 'otrocorreo@dominio.com'
 );
 
-PHPErrorLog::write('probando...',PEL_CRITICAL,"Jerry Anselmi <jerry.anselmi@gmail.com>,Pedro Perez <pperez@dominio.com>,fulano@dominio.com",$headers);
+$logger->write('probando...',PEL_CRITICAL,"Jerry Anselmi <jerry.anselmi@gmail.com>,Pedro Perez <pperez@dominio.com>,fulano@dominio.com",$headers);
 ```
 #### Email con contenido HTML
 ```php
@@ -104,15 +106,15 @@ $headers = array(
   'Cc'           => 'otrocorreo@dominio.com'
 );
 
-PHPErrorLog::write('<h1>PHPErrorLog</h1><br><p>probando...</p>',PEL_WARNING,"Jerry Anselmi <jerry.anselmi@gmail.com>,Pedro Perez <pperez@dominio.com>,fulano@dominio.com",$headers);
+$logger->write('<h1>PHPErrorLog</h1><br><p>probando...</p>',PEL_WARNING,"Jerry Anselmi <jerry.anselmi@gmail.com>,Pedro Perez <pperez@dominio.com>,fulano@dominio.com",$headers);
 ```
 
 ### Enviando Logs a un Archivo Definifo por el Usuario
 ```php
-PHPErrorLog::write('probando...',PEL_ERROR,realpath('dev.log'));
+$logger->write('probando...',PEL_ERROR,realpath('dev.log'));
 ```
 ```php
-PHPErrorLog::write('probando...',PEL_DEBUG,'/ruta/absoluta/del/dev.log');
+$logger->write('probando...',PEL_DEBUG,'/ruta/absoluta/del/dev.log');
 ```
 
 ## Posibles impedimentos paraescribir el log
@@ -120,7 +122,7 @@ PHPErrorLog::write('probando...',PEL_DEBUG,'/ruta/absoluta/del/dev.log');
 * El mensaje es *empty*
 * No se agrego la cabecera **From** en caso de que se desee enviar por correo
 * Que no se tengan permisos de escritura en caso d eque el usuario defina el log, sin embargo el log se va a escribir en el archvio default
- 
+
 ### El tema de los permisos
 
 En caso de que definamos el archivo log, tenemos que asignarle a apache como dueño del mismo o darle permisos de escritura

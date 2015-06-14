@@ -74,5 +74,5 @@ class PHPErrorLog extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->logger->write('Probando log notice',PEL_NOTICE,$this->filelog));
         $this->assertTrue($this->logger->write('Probando log info',PEL_INFO,$this->filelog));
         $this->assertTrue($this->logger->write('Probando log debug',PEL_DEBUG,$this->filelog));
-    }    
+    }
 }
