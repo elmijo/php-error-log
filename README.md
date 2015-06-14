@@ -1,7 +1,7 @@
 PHP Error Log
 =============
 
-[![Build Status](https://travis-ci.org/ElMijo/php-error-log.svg)](https://travis-ci.org/ElMijo/php-error-log) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ElMijo/php-error-log/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ElMijo/php-error-log/?branch=master)
+[![Build Status](https://travis-ci.org/ElMijo/php-error-log.svg)](https://travis-ci.org/ElMijo/php-error-log) [![Coverage Status](https://coveralls.io/repos/ElMijo/php-error-log/badge.svg)](https://coveralls.io/r/ElMijo/php-error-log) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ElMijo/php-error-log/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ElMijo/php-error-log/?branch=master)
 
 Una pequeña libreria para manejar los logs de tu aplicación de forma simple.. rapida.. y directa!!. En lineas lo que se hizo fue crear una capa de abstracción entre el programador y la función **error_log()** de PHP.
 
