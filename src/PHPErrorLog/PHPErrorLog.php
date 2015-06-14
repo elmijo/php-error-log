@@ -65,7 +65,8 @@ class PHPErrorLog
 			}
 			else
 			{
-				$arguments[0] = trim(preg_replace('/\s\s+/', ' ', array_pop(explode("]",$arguments[0]))));
+				$args = explode("]",$arguments[0]);
+				$arguments[0] = trim(preg_replace('/\s\s+/', ' ', array_pop($args)));
 			}
 
 			return call_user_func_array('error_log',$arguments);
@@ -78,7 +79,7 @@ class PHPErrorLog
 
 	/**
 	 * Valida si una cadena de texto es un email
-	 * @param  styring  $destination Cadena de texto a evaluar
+	 * @param  string  $destination Cadena de texto a evaluar
 	 * @return boolean               Devuelve TRUE si es email o FALSE en caso contrario
 	 */
 	private function validaEmails($destination)
@@ -88,8 +89,9 @@ class PHPErrorLog
 			array_filter(
 				array_map(
 					function($val){
+						$args = explode('<',$val);
 						return !!filter_var(
-								str_replace('>', '', array_pop(explode('<',$val)))
+								str_replace('>', '', array_pop($args))
 								,FILTER_VALIDATE_EMAIL
 							)?$val:FALSE
 						;
