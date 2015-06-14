@@ -208,4 +208,3 @@ class PHPErrorLog
 		return implode("\r\n", $headers);
 	}
 }
-?>
